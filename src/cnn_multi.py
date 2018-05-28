@@ -1,3 +1,4 @@
+from __future__ import division
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Convolution2D, MaxPooling2D
@@ -14,6 +15,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import recall_score
 from sklearn.metrics import precision_score
 from sklearn.utils import class_weight
+
 import os
 
 np.random.seed(1337)
@@ -119,7 +121,7 @@ def cnn_model(X_train, X_test, y_train, y_test, kernel_size, nb_filters, channel
 
     stop = EarlyStopping(monitor='val_acc',
                             min_delta=0.001,
-                            patience=2,
+                            patience=5,
                             verbose=0,
                             mode='auto')
 
@@ -146,7 +148,7 @@ def save_model(model, score, model_name):
         model_name: name of model to be saved
     '''
 
-    if score >= 0.75:
+    if score >= 0.50:
         print("Saving Model")
         model.save("../models/" + model_name + "_recall_" + str(round(score,4)) + ".h5")
     else:
@@ -156,12 +158,12 @@ def save_model(model, score, model_name):
 if __name__ == '__main__':
 
     # Specify GPU's to Use
-    os.environ["CUDA_VISIBLE_DEVICES"]="0,1,2,3"
+    os.environ["CUDA_VISIBLE_DEVICES"]=""
 
     # Specify parameters before model is run.
-    batch_size = 1000
-    nb_classes = 5
-    nb_epoch = 30
+    batch_size = 100
+    nb_classes = 2
+    nb_epoch = 1
 
     img_rows, img_cols = 256, 256
     channels = 3
@@ -169,8 +171,9 @@ if __name__ == '__main__':
     kernel_size = (8,8)
 
     # Import data
-    labels = pd.read_csv("../labels/trainLabels_master_256_v2.csv")
-    X = np.load("../data/X_train_256_v2.npy")
+    # labels = pd.read_csv("../labels/trainLabels_master_256_v2.csv")
+    labels = pd.read_csv("../labels/trainLabels_master_256_v2_small_binary.csv")
+    X = np.load("../data/X_train.npy")
     y = np.array(labels['level'])
 
 
@@ -216,7 +219,7 @@ if __name__ == '__main__':
 
     print("Predicting")
     y_pred = model.predict(X_test)
-
+    print(y_pred)
 
     score = model.evaluate(X_test, y_test, verbose=0)
     print('Test score:', score[0])
@@ -235,7 +238,7 @@ if __name__ == '__main__':
     print("Recall: ", recall)
 
 
-    save_model(model=model, score=recall, model_name="DR_Two_Classes")
+    # save_model(model=model, score=recall, model_name="DR_Two_Classes")
 
 
     print("Completed")

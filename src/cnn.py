@@ -12,6 +12,8 @@ from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from sklearn.model_selection import train_test_split
 
+import os
+
 np.random.seed(1337)
 
 
@@ -46,7 +48,7 @@ def reshape_data(arr, img_rows, img_cols, channels):
     return arr.reshape(arr.shape[0], img_rows, img_cols, channels)
 
 
-def cnn_model(X_train, y_train, kernel_size, nb_filters, channels, nb_epoch, batch_size, nb_classes, nb_gpus):
+def cnn_model(X_train, y_train, kernel_size, nb_filters, channels, nb_epoch, batch_size, nb_classes):
     """
     Define and run the Convolutional Neural Network
 
@@ -88,7 +90,8 @@ def cnn_model(X_train, y_train, kernel_size, nb_filters, channels, nb_epoch, bat
     model.add(Dense(nb_classes))
     model.add(Activation('softmax'))
 
-    model = multi_gpu_model(model, gpus=nb_gpus)
+    # model = multi_gpu_model(model, gpus=nb_gpus)
+    # model = multi_gpu_model(model, cpu_relocation=True)
 
     model.compile(loss='binary_crossentropy',
                   optimizer='adam',
@@ -129,8 +132,11 @@ def save_model(model, score, model_name):
 
 
 if __name__ == '__main__':
+    # Specify GPU's to Use
+    os.environ["CUDA_VISIBLE_DEVICES"] = ""
+
     # Specify parameters before model is run.
-    batch_size = 512
+    batch_size = 50
     nb_classes = 2
     nb_epoch = 30
 
@@ -140,8 +146,8 @@ if __name__ == '__main__':
     kernel_size = (8, 8)
 
     # Import data
-    labels = pd.read_csv("../labels/trainLabels_master_256_v2.csv")
-    X = np.load("../data/X_train_256_v2.npy")
+    labels = pd.read_csv("../labels/trainLabels_master_256_v2_small.csv")
+    X = np.load("../data/X_train.npy")
     y = np.array([1 if l >= 1 else 0 for l in labels['level']])
     # y = np.array(labels['level'])
 
@@ -172,7 +178,7 @@ if __name__ == '__main__':
     print("Training Model")
 
     model = cnn_model(X_train, y_train, kernel_size, nb_filters, channels, nb_epoch, batch_size,
-                      nb_classes, nb_gpus=8)
+                      nb_classes)
 
     print("Predicting")
     y_pred = model.predict(X_test)

@@ -15,6 +15,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.utils import class_weight
 from skll.metrics import kappa
 
+import os
+
 np.random.seed(1337)
 
 
@@ -118,7 +120,7 @@ class EyeNet:
 
         self.model.add(Dense(self.nb_classes, activation="softmax"))
 
-        self.model = multi_gpu_model(self.model, gpus=self.n_gpus)
+        # self.model = multi_gpu_model(self.model, gpus=self.n_gpus)
 
         self.model.compile(loss="categorical_crossentropy",
                            optimizer="adam",
@@ -172,7 +174,7 @@ class EyeNet:
         OUTPUT
             Saved model, based on scoring criteria input.
         """
-        if score >= 0.75:
+        if score >= 0.60:
             print("Saving Model")
             self.model.save("../models/" + model_name + "_recall_" + str(round(score, 4)) + ".h5")
         else:
@@ -180,10 +182,12 @@ class EyeNet:
 
 
 if __name__ == '__main__':
+    # Specify GPU's to Use
+    os.environ["CUDA_VISIBLE_DEVICES"] = ""
     cnn = EyeNet()
-    cnn.split_data(y_file_path="../labels/trainLabels_master_256_v2.csv", X="../data/X_train_256_v2.npy")
-    cnn.reshape_data(img_rows=256, img_cols=256, channels=3, nb_classes=5)
-    model = cnn.cnn_model(nb_filters=32, kernel_size=(4, 4), batch_size=512, nb_epoch=50)
+    cnn.split_data(y_file_path="../labels/trainLabels_master_256_v2_small.csv", X="../data/X_train.npy")
+    cnn.reshape_data(img_rows=256, img_cols=256, channels=3, nb_classes=2)
+    model = cnn.cnn_model(nb_filters=32, kernel_size=(4, 4), batch_size=100, nb_epoch=50)
     precision, recall, f1, cohen_kappa, quad_kappa  = cnn.predict()
     print("Precision: ", precision)
     print("Recall: ", recall)
