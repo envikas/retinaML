@@ -45,12 +45,11 @@ def crop_and_resize_images(path, new_path, cropx, cropy, img_size=256):
         starty = y//2-(cropy//2)
         img = img[starty:starty+cropy,startx:startx+cropx]
         img = resize(img, (256,256))
-        print(item)
         io.imsave(str(new_path + item), img)
         total += 1
         print("Saving: ", item, total)
 
 
 if __name__ == '__main__':
-    # crop_and_resize_images(path='../data/train/', new_path='../data/train-resized-256/', cropx=1800, cropy=1800, img_size=256)
-    crop_and_resize_images(path='../data/test/', new_path='../data/test-resized-256_single/', cropx=1800, cropy=1800, img_size=256)
+    crop_and_resize_images(path='D:/temp/data/train/', new_path='../data/train-resized-256/', cropx=1800, cropy=1800, img_size=256)
+    crop_and_resize_images(path='D:/temp/data/test/', new_path='../data/test-resized-256/', cropx=1800, cropy=1800, img_size=256)

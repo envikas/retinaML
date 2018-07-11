@@ -31,14 +31,9 @@ def convert_images_to_arrays_train(file_path, df):
 
     lst_imgs = [l for l in df['train_image_name']]
     returnVal = []
-    count = 0
     # return np.array([np.array(Image.open(file_path + img)) for img in lst_imgs])
     for img in lst_imgs:
       returnVal.append(np.array(Image.open(file_path + img)))
-      print (returnVal
-             )
-      count = count + 1
-      print(count)
     return np.array(returnVal)
 
 
@@ -55,21 +50,10 @@ def save_to_array(arr_name, arr_object):
     return np.save(arr_name, arr_object)
 
 
-if __name__ == '__main__':
-    start_time = time.time()
-
-    # labels = pd.read_csv("../labels/trainLabels_master_256_v2.csv")
-    labels = pd.read_csv("../labels/single_label.csv")
-
-    print("Writing Train Array")
-    # X_train = convert_images_to_arrays_train('../data/train-resized-256/', labels)
-    X_train = convert_images_to_arrays_train('../data/test-resized-256_single/', labels)
-
-
-    print(X_train.shape)
-
-    print("Saving Train Array")
-    print(X_train)
-    # save_to_array('../data/X_train.npy', X_train)
-
-    print("--- %s seconds ---" % (time.time() - start_time))
+# if __name__ == '__main__':
+#     labels = pd.read_csv("../labels/trainLabels_master_256_v2.csv")
+#
+#     print("Writing Train Array")
+#     X_trainarray = convert_images_to_arrays_train('../data/train-resized-256/', labels)
+#
+#     save_to_array('../data/X_train.npy', X_trainarray)

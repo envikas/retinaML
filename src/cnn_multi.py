@@ -1,4 +1,4 @@
-from __future__ import division
+import time
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Convolution2D, MaxPooling2D
@@ -15,9 +15,15 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import recall_score
 from sklearn.metrics import precision_score
 from sklearn.utils import class_weight
-
 import os
+import pickle
+import gc
+import numpy as np
+import pandas as pd
+from PIL import Image
+from image_to_array import change_image_name,convert_images_to_arrays_train,save_to_array
 
+start_time = time.time()
 np.random.seed(1337)
 
 
@@ -52,7 +58,7 @@ def reshape_data(arr, img_rows, img_cols, channels):
     return arr.reshape(arr.shape[0], img_rows, img_cols, channels)
 
 
-def cnn_model(X_train, X_test, y_train, y_test, kernel_size, nb_filters, channels, nb_epoch, batch_size, nb_classes):
+def cnn_model (kernel_size, nb_filters, channels, nb_classes):
     '''
     Define and run the Convolutional Neural Network
 
@@ -119,22 +125,6 @@ def cnn_model(X_train, X_test, y_train, y_test, kernel_size, nb_filters, channel
                     metrics=['accuracy'])
 
 
-    stop = EarlyStopping(monitor='val_acc',
-                            min_delta=0.001,
-                            patience=5,
-                            verbose=0,
-                            mode='auto')
-
-
-    tensor_board = TensorBoard(log_dir='./Graph', histogram_freq=0, write_graph=True, write_images=True)
-
-
-    model.fit(X_train,y_train, batch_size=batch_size, epochs=nb_epoch,
-                verbose=1,
-                validation_split=0.2,
-                class_weight=weights,
-                callbacks=[stop, tensor_board])
-
     return model
 
 
@@ -158,7 +148,7 @@ def save_model(model, score, model_name):
 if __name__ == '__main__':
 
     # Specify GPU's to Use
-    os.environ["CUDA_VISIBLE_DEVICES"]=""
+    os.environ["CUDA_VISIBLE_DEVICES"]="0,1,2,3"
 
     # Specify parameters before model is run.
     batch_size = 100
@@ -169,52 +159,68 @@ if __name__ == '__main__':
     channels = 3
     nb_filters = 32
     kernel_size = (8,8)
+    model = cnn_model( kernel_size, nb_filters, channels, nb_classes)
+    stop = EarlyStopping(monitor='val_acc',
+                         min_delta=0.001,
+                         patience=5,
+                         verbose=0,
+                         mode='auto')
+
+    tensor_board = TensorBoard(log_dir='./Graph', histogram_freq=0, write_graph=True, write_images=True)
 
     # Import data
     # labels = pd.read_csv("../labels/trainLabels_master_256_v2.csv")
-    labels = pd.read_csv("../labels/trainLabels_master_256_v2_small_binary.csv")
-    X = np.load("../data/X_train.npy")
-    y = np.array(labels['level'])
+    labels = pd.read_csv("../labels/trainLabels_master_256_v2_binary.csv")
+    X1 = np.load("../data/X_train.npy")
+    X_SplitList = np.array_split(X1,10)
+    y1 = np.array(labels['level'])
+    y_SplitList = np.array_split(y1, 10)
+
+    for i in range (0, len(X_SplitList)):
+        X = X_SplitList[i]
+        y = y_SplitList[i]
+
+        # Class Weights (for imbalanced classes)
+        print("Computing Class Weights")
+        weights = class_weight.compute_class_weight('balanced', np.unique(y), y)
 
 
-    # Class Weights (for imbalanced classes)
-    print("Computing Class Weights")
-    weights = class_weight.compute_class_weight('balanced', np.unique(y), y)
+        print("Splitting data into test/ train datasets")
+        X_train, X_test, y_train, y_test = split_data(X, y, 0.2)
 
 
-    print("Splitting data into test/ train datasets")
-    X_train, X_test, y_train, y_test = split_data(X, y, 0.2)
+        print("Reshaping Data")
+        X_train = reshape_data(X_train, img_rows, img_cols, channels)
+        X_test = reshape_data(X_test, img_rows, img_cols, channels)
+
+        print("X_train Shape: ", X_train.shape)
+        print("X_test Shape: ", X_test.shape)
+
+        input_shape = (img_rows, img_cols, channels)
 
 
-    print("Reshaping Data")
-    X_train = reshape_data(X_train, img_rows, img_cols, channels)
-    X_test = reshape_data(X_test, img_rows, img_cols, channels)
+        print("Normalizing Data")
+        X_train = X_train.astype('float32')
+        X_test = X_test.astype('float32')
 
-    print("X_train Shape: ", X_train.shape)
-    print("X_test Shape: ", X_test.shape)
-
-
-    input_shape = (img_rows, img_cols, channels)
+        X_train /= 255
+        X_test /= 255
 
 
-    print("Normalizing Data")
-    X_train = X_train.astype('float32')
-    X_test = X_test.astype('float32')
-
-    X_train /= 255
-    X_test /= 255
+        y_train = np_utils.to_categorical(y_train, nb_classes)
+        y_test = np_utils.to_categorical(y_test, nb_classes)
+        print("y_train Shape: ", y_train.shape)
+        print("y_test Shape: ", y_test.shape)
 
 
-    y_train = np_utils.to_categorical(y_train, nb_classes)
-    y_test = np_utils.to_categorical(y_test, nb_classes)
-    print("y_train Shape: ", y_train.shape)
-    print("y_test Shape: ", y_test.shape)
+        print("Training Model")
 
 
-    print("Training Model")
-
-
-    model = cnn_model(X_train, X_test, y_train, y_test, kernel_size, nb_filters, channels, nb_epoch, batch_size, nb_classes)
+        model.fit(X_train, y_train, batch_size=batch_size, epochs=nb_epoch,
+                  verbose=1,
+                  validation_split=0.2,
+                  class_weight=weights,
+                  callbacks=[stop, tensor_board])
 
 
     print("Predicting")
@@ -242,3 +248,4 @@ if __name__ == '__main__':
 
 
     print("Completed")
+    print("--- %s seconds ---" % (time.time() - start_time))
