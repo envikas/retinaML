@@ -152,8 +152,8 @@ if __name__ == '__main__':
 
     # Specify parameters before model is run.
     batch_size = 100
-    nb_classes = 2
-    nb_epoch = 1
+    nb_classes = 5
+    nb_epoch = 300
 
     img_rows, img_cols = 256, 256
     channels = 3
@@ -162,20 +162,23 @@ if __name__ == '__main__':
     model = cnn_model( kernel_size, nb_filters, channels, nb_classes)
     stop = EarlyStopping(monitor='val_acc',
                          min_delta=0.001,
-                         patience=5,
+                         patience=50,
                          verbose=0,
                          mode='auto')
 
     tensor_board = TensorBoard(log_dir='./Graph', histogram_freq=0, write_graph=True, write_images=True)
 
     # Import data
-    # labels = pd.read_csv("../labels/trainLabels_master_256_v2.csv")
-    labels = pd.read_csv("../labels/trainLabels_master_256_v2_binary.csv")
+    labels = pd.read_csv("../labels/trainLabels_master_256_v2.csv")
+    # Use this if the number of classes you want is 2
+    # labels = pd.read_csv("../labels/trainLabels_master_256_v2_binary.csv")
     X1 = np.load("../data/X_train.npy")
+    # Splitting the array into 10 parts to fit in CPU memory
     X_SplitList = np.array_split(X1,10)
     y1 = np.array(labels['level'])
     y_SplitList = np.array_split(y1, 10)
 
+    # Running the training for every element in the above split array
     for i in range (0, len(X_SplitList)):
         X = X_SplitList[i]
         y = y_SplitList[i]
@@ -244,7 +247,7 @@ if __name__ == '__main__':
     print("Recall: ", recall)
 
 
-    # save_model(model=model, score=recall, model_name="DR_Two_Classes")
+    save_model(model=model, score=recall, model_name="DR_Five_Classes")
 
 
     print("Completed")

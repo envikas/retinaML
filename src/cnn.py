@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import tensorflow as tf
 from keras.callbacks import EarlyStopping
 from keras.callbacks import TensorBoard
 from keras.layers import Dense, Dropout, Activation, Flatten
@@ -16,7 +17,7 @@ import os
 
 np.random.seed(1337)
 
-
+sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
 def split_data(X, y, test_data_size):
     """
     Split data into test and training datasets.
@@ -48,7 +49,7 @@ def reshape_data(arr, img_rows, img_cols, channels):
     return arr.reshape(arr.shape[0], img_rows, img_cols, channels)
 
 
-def cnn_model(X_train, y_train, kernel_size, nb_filters, channels, nb_epoch, batch_size, nb_classes):
+def cnn_model(X_train, y_train, kernel_size, nb_filters, channels, nb_epoch, batch_size, nb_classes, nb_gpus):
     """
     Define and run the Convolutional Neural Network
 
@@ -90,7 +91,7 @@ def cnn_model(X_train, y_train, kernel_size, nb_filters, channels, nb_epoch, bat
     model.add(Dense(nb_classes))
     model.add(Activation('softmax'))
 
-    # model = multi_gpu_model(model, gpus=nb_gpus)
+    model = multi_gpu_model(model, gpus=nb_gpus)
     # model = multi_gpu_model(model, cpu_relocation=True)
 
     model.compile(loss='binary_crossentropy',
@@ -132,11 +133,9 @@ def save_model(model, score, model_name):
 
 
 if __name__ == '__main__':
-    # Specify GPU's to Use
-    os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
     # Specify parameters before model is run.
-    batch_size = 50
+    batch_size = 512
     nb_classes = 2
     nb_epoch = 30
 
@@ -146,7 +145,7 @@ if __name__ == '__main__':
     kernel_size = (8, 8)
 
     # Import data
-    labels = pd.read_csv("../labels/trainLabels_master_256_v2_small.csv")
+    labels = pd.read_csv("../labels/trainLabels_master_256_v2_small_binary.csv")
     X = np.load("../data/X_train.npy")
     y = np.array([1 if l >= 1 else 0 for l in labels['level']])
     # y = np.array(labels['level'])
@@ -178,7 +177,7 @@ if __name__ == '__main__':
     print("Training Model")
 
     model = cnn_model(X_train, y_train, kernel_size, nb_filters, channels, nb_epoch, batch_size,
-                      nb_classes)
+                      nb_classes, nb_gpus=2)
 
     print("Predicting")
     y_pred = model.predict(X_test)

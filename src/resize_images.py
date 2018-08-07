@@ -1,11 +1,15 @@
 import os
 import sys
 # from PIL import Image
+from typing import Union
+
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 from skimage import io
 from skimage.transform import resize
 import numpy as np
+from multiprocessing import pool
+from multiprocessing.dummy import Pool as ThreadPool
 
 
 def create_directory(directory):
@@ -37,17 +41,35 @@ def crop_and_resize_images(path, new_path, cropx, cropy, img_size=256):
     create_directory(new_path)
     dirs = [l for l in os.listdir(path) if l != '.DS_Store']
     total = 0
+    images = []
 
     for item in dirs:
-        img = io.imread(path+item)
-        y,x,channel = img.shape
-        startx = x//2-(cropx//2)
-        starty = y//2-(cropy//2)
-        img = img[starty:starty+cropy,startx:startx+cropx]
+        images.append(item)
+
+    def resize_save_image(item):
+        img = io.imread(path + item)
+        y, x, channel = img.shape
+        startx = x // 2 - (cropx // 2)
+        starty = y // 2 - (cropy // 2)
+        img = img[starty:starty + cropy, startx:startx + cropx]
         img = resize(img, (256,256))
         io.imsave(str(new_path + item), img)
-        total += 1
-        print("Saving: ", item, total)
+        print("Saving: ", item)
+
+    pool = ThreadPool()
+    pool.map(resize_save_image, images)
+
+    ## Single threaded implementation
+    # for item in dirs:
+    #     img = io.imread(path+item)
+    #     y,x,channel = img.shape
+    #     startx = x//2-(cropx//2)
+    #     starty = y//2-(cropy//2)
+    #     img = img[starty:starty+cropy,startx:startx+cropx]
+    #     img = resize(img, (256,256))
+    #     io.imsave(str(new_path + item), img)
+    #     total += 1
+    #     print("Saving: ", item, total)
 
 
 if __name__ == '__main__':
