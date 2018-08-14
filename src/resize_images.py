@@ -73,5 +73,5 @@ def crop_and_resize_images(path, new_path, cropx, cropy, img_size=256):
 
 
 if __name__ == '__main__':
-    crop_and_resize_images(path='D:/temp/data/train/', new_path='../data/train-resized-256/', cropx=1800, cropy=1800, img_size=256)
-    crop_and_resize_images(path='D:/temp/data/test/', new_path='../data/test-resized-256/', cropx=1800, cropy=1800, img_size=256)
+    crop_and_resize_images(path='D:/DogsCats/train/train/', new_path='../dc/train-resized-256/', cropx=1800, cropy=1800, img_size=256)
+    crop_and_resize_images(path='D:/DogsCats/test1/test1/', new_path='../dc/test-resized-256/', cropx=1800, cropy=1800, img_size=256)

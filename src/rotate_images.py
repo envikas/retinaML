@@ -21,7 +21,7 @@ def rotate_images(file_path, degrees_of_rotation, lst_imgs):
     '''
 
     for l in lst_imgs:
-        img = io.imread(file_path + str(l) + '.jpeg')
+        img = io.imread(file_path + str(l) + '.jpg')
         img = rotate(img, degrees_of_rotation)
         io.imsave(file_path + str(l) + '_' + str(degrees_of_rotation) + '.jpeg', img)
 
@@ -47,13 +47,12 @@ def mirror_images(file_path, mirror_direction, lst_imgs):
 
 if __name__ == '__main__':
     start_time = time.time()
-    trainLabels = pd.read_csv("../labels/trainLabels_master.csv")
+    trainLabels = pd.read_csv("../labels/trainLabels_dc_master.csv")
 
     trainLabels['image'] = trainLabels['image'].str.rstrip('.jpeg')
-    trainLabels_no_DR = trainLabels[trainLabels['level'] == 0]
-    trainLabels_DR = trainLabels[trainLabels['level'] >= 1]
 
-    lst_imgs_no_DR = [i for i in trainLabels_no_DR['image']]
+    trainLabels_DR = trainLabels[trainLabels['level'] >= 0]
+
     lst_imgs_DR = [i for i in trainLabels_DR['image']]
 
     # lst_sample = [i for i in os.listdir('../data/sample/') if i != '.DS_Store']
@@ -62,24 +61,24 @@ if __name__ == '__main__':
 
     # Mirror Images with no DR one time
     print("Mirroring Non-DR Images")
-    mirror_images('../data/train-resized-256/', 1, lst_imgs_no_DR)
+    mirror_images('../dc/train-resized-256/', 1, lst_imgs_DR)
 
 
     # Rotate all images that have any level of DR
     print("Rotating 90 Degrees")
-    rotate_images('../data/train-resized-256/', 90, lst_imgs_DR)
+    rotate_images('../dc/train-resized-256/', 90, lst_imgs_DR)
 
     print("Rotating 120 Degrees")
-    rotate_images('../data/train-resized-256/', 120, lst_imgs_DR)
+    rotate_images('../dc/train-resized-256/', 120, lst_imgs_DR)
 
     print("Rotating 180 Degrees")
-    rotate_images('../data/train-resized-256/', 180, lst_imgs_DR)
+    rotate_images('../dc/train-resized-256/', 180, lst_imgs_DR)
 
     print("Rotating 270 Degrees")
-    rotate_images('../data/train-resized-256/', 270, lst_imgs_DR)
+    rotate_images('../dc/train-resized-256/', 270, lst_imgs_DR)
 
     print("Mirroring DR Images")
-    mirror_images('../data/train-resized-256/', 0, lst_imgs_DR)
+    mirror_images('../dc/train-resized-256/', 0, lst_imgs_DR)
 
     print("Completed")
     print("--- %s seconds ---" % (time.time() - start_time))

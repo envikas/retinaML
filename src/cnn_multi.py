@@ -152,8 +152,8 @@ if __name__ == '__main__':
 
     # Specify parameters before model is run.
     batch_size = 100
-    nb_classes = 5
-    nb_epoch = 300
+    nb_classes = 2
+    nb_epoch = 20
 
     img_rows, img_cols = 256, 256
     channels = 3
@@ -162,17 +162,17 @@ if __name__ == '__main__':
     model = cnn_model( kernel_size, nb_filters, channels, nb_classes)
     stop = EarlyStopping(monitor='val_acc',
                          min_delta=0.001,
-                         patience=50,
+                         patience=2,
                          verbose=0,
                          mode='auto')
 
     tensor_board = TensorBoard(log_dir='./Graph', histogram_freq=0, write_graph=True, write_images=True)
 
     # Import data
-    labels = pd.read_csv("../labels/trainLabels_master_256_v2.csv")
+    labels = pd.read_csv("../labels/trainLabels_dc_master.csv")
     # Use this if the number of classes you want is 2
     # labels = pd.read_csv("../labels/trainLabels_master_256_v2_binary.csv")
-    X1 = np.load("../data/X_train.npy")
+    X1 = np.load("../dc/X_train.npy")
     # Splitting the array into 10 parts to fit in CPU memory
     X_SplitList = np.array_split(X1,10)
     y1 = np.array(labels['level'])
@@ -184,7 +184,7 @@ if __name__ == '__main__':
         y = y_SplitList[i]
 
         # Class Weights (for imbalanced classes)
-        print("Computing Class Weights")
+        print("Computing Class Weights, iteration " + str(i))
         weights = class_weight.compute_class_weight('balanced', np.unique(y), y)
 
 
