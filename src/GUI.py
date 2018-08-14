@@ -72,7 +72,7 @@ def analyze():
     # Passing the image through the NN model
     img_rows, img_cols = 256, 256
     channels = 3
-    model = load_model('../models/DR_Two_Classes_recall_0.7606.h5')
+    model = load_model('../models/DR_Five_Classes_recall_1.0.h5')
     X_test=  imageArray
     X_test = reshape_data(X_test, img_rows, img_cols, channels)
     X_test = X_test.astype('float32')
@@ -82,13 +82,13 @@ def analyze():
     lefteyeresult = ''
     righteyeresult = ''
     if y_pred[0] == 0:
-       lefteyeresult = 'No Retinopathy'
+       lefteyeresult = 'Cat'
     elif y_pred[0]== 1:
-        lefteyeresult = 'Possible Retinopathy'
+        lefteyeresult = 'Dog'
     if y_pred[1] == 1:
-        righteyeresult = 'Possible Retinopathy'
+        righteyeresult = 'Dog'
     elif y_pred[1] == 0:
-        righteyeresult = 'No Retinopathy'
+        righteyeresult = 'Cat'
     returnText = 'Left Eye Result: ' + lefteyeresult  + "       Right Eye Result: " + righteyeresult
     result.config(text=returnText)
 
