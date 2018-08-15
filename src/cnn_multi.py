@@ -81,26 +81,28 @@ def cnn_model (kernel_size, nb_filters, channels, nb_classes):
     model = Sequential()
 
 
-    model.add(Conv2D(nb_filters, (kernel_size[0], kernel_size[1]),
+    model.add(Conv2D(64, (9, 9),
         padding='valid',
         strides=4,
         input_shape=(img_rows, img_cols, channels)))
     model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
 
 
-    model.add(Conv2D(nb_filters, (kernel_size[0], kernel_size[1])))
+    model.add(Conv2D(32, (7, 7)))
     model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
 
 
-    model.add(Conv2D(nb_filters, (kernel_size[0], kernel_size[1])))
+    model.add(Conv2D(16, (5, 5)))
     model.add(Activation('relu'))
 
 
     model.add(MaxPooling2D(pool_size=(2,2)))
 
 
-    kernel_size = (16,16)
-    model.add(Conv2D(64, (kernel_size[0], kernel_size[1])))
+    kernel_size = (3,3)
+    model.add(Conv2D(8, (kernel_size[0], kernel_size[1])))
     model.add(Activation('relu'))
     # model.add(Dropout(0.2))
 
@@ -153,7 +155,7 @@ if __name__ == '__main__':
     # Specify parameters before model is run.
     batch_size = 100
     nb_classes = 2
-    nb_epoch = 20
+    nb_epoch = 100
 
     img_rows, img_cols = 256, 256
     channels = 3
@@ -161,8 +163,8 @@ if __name__ == '__main__':
     kernel_size = (8,8)
     model = cnn_model( kernel_size, nb_filters, channels, nb_classes)
     stop = EarlyStopping(monitor='val_acc',
-                         min_delta=0.001,
-                         patience=2,
+                         min_delta=0.01,
+                         patience=5,
                          verbose=0,
                          mode='auto')
 
@@ -174,9 +176,9 @@ if __name__ == '__main__':
     # labels = pd.read_csv("../labels/trainLabels_master_256_v2_binary.csv")
     X1 = np.load("../dc/X_train.npy")
     # Splitting the array into 10 parts to fit in CPU memory
-    X_SplitList = np.array_split(X1,10)
+    X_SplitList = np.array_split(X1,1)
     y1 = np.array(labels['level'])
-    y_SplitList = np.array_split(y1, 10)
+    y_SplitList = np.array_split(y1, 1)
 
     # Running the training for every element in the above split array
     for i in range (0, len(X_SplitList)):
