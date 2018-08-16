@@ -80,37 +80,31 @@ def cnn_model (kernel_size, nb_filters, channels, nb_classes):
 
     model = Sequential()
 
+    model.add(Conv2D(64, (9, 9),
+                     padding='valid',
+                     strides=4,
+                     input_shape=(img_rows, img_cols, channels)))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
 
-    model.add(Conv2D(nb_filters, (kernel_size[0], kernel_size[1]),
-        padding='valid',
-        strides=4,
-        input_shape=(img_rows, img_cols, channels)))
+    model.add(Conv2D(32, (7, 7)))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+
+    model.add(Conv2D(16, (5, 5)))
     model.add(Activation('relu'))
 
+    model.add(MaxPooling2D(pool_size=(2, 2)))
 
-    model.add(Conv2D(nb_filters, (kernel_size[0], kernel_size[1])))
-    model.add(Activation('relu'))
-
-
-    model.add(Conv2D(nb_filters, (kernel_size[0], kernel_size[1])))
-    model.add(Activation('relu'))
-
-
-    model.add(MaxPooling2D(pool_size=(2,2)))
-
-
-    kernel_size = (16,16)
-    model.add(Conv2D(64, (kernel_size[0], kernel_size[1])))
+    kernel_size = (3, 3)
+    model.add(Conv2D(8, (kernel_size[0], kernel_size[1])))
     model.add(Activation('relu'))
     # model.add(Dropout(0.2))
 
-
-    model.add(MaxPooling2D(pool_size=(2,2)))
-
+    model.add(MaxPooling2D(pool_size=(2, 2)))
 
     model.add(Flatten())
     print("Model flattened out to: ", model.output_shape)
-
 
     model.add(Dense(128))
     model.add(Activation('sigmoid'))
@@ -153,7 +147,7 @@ if __name__ == '__main__':
     # Specify parameters before model is run.
     batch_size = 100
     nb_classes = 5
-    nb_epoch = 300
+    nb_epoch = 50
 
     img_rows, img_cols = 256, 256
     channels = 3
@@ -162,7 +156,7 @@ if __name__ == '__main__':
     model = cnn_model( kernel_size, nb_filters, channels, nb_classes)
     stop = EarlyStopping(monitor='val_acc',
                          min_delta=0.001,
-                         patience=50,
+                         patience=10,
                          verbose=0,
                          mode='auto')
 
@@ -179,7 +173,7 @@ if __name__ == '__main__':
     y_SplitList = np.array_split(y1, 10)
 
     # Running the training for every element in the above split array
-    for i in range (0, len(X_SplitList)):
+    for i in range (0, len(X_SplitList)-1):
         X = X_SplitList[i]
         y = y_SplitList[i]
 
