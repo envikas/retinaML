@@ -80,35 +80,39 @@ def cnn_model (kernel_size, nb_filters, channels, nb_classes):
 
     model = Sequential()
 
-    model.add(Conv2D(64, (9, 9),
+    model.add(Conv2D(30, (5, 5),
                      padding='valid',
                      strides=4,
                      input_shape=(img_rows, img_cols, channels)))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
 
-    model.add(Conv2D(32, (7, 7)))
+    model.add(Conv2D(15, (3, 3)))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
 
-    model.add(Conv2D(16, (5, 5)))
+    model.add(Conv2D(8, (3, 3)))
     model.add(Activation('relu'))
-
     model.add(MaxPooling2D(pool_size=(2, 2)))
 
-    kernel_size = (3, 3)
-    model.add(Conv2D(8, (kernel_size[0], kernel_size[1])))
-    model.add(Activation('relu'))
+    # kernel_size = (3, 3)
+    # model.add(Conv2D(8, (kernel_size[0], kernel_size[1])))
+    # model.add(Activation('relu'))
     # model.add(Dropout(0.2))
-
-    model.add(MaxPooling2D(pool_size=(2, 2)))
+    #
+    # model.add(MaxPooling2D(pool_size=(2, 2)))
 
     model.add(Flatten())
     print("Model flattened out to: ", model.output_shape)
 
-    model.add(Dense(128))
+    model.add(Dense(64))
     model.add(Activation('sigmoid'))
     model.add(Dropout(0.25))
+
+    # model.add(Dense(16))
+    # model.add(Activation('sigmoid'))
+    # model.add(Dropout(0.25))
+
 
     model.add(Dense(nb_classes))
     model.add(Activation('softmax'))
@@ -146,7 +150,7 @@ if __name__ == '__main__':
 
     # Specify parameters before model is run.
     batch_size = 100
-    nb_classes = 5
+    nb_classes = 2
     nb_epoch = 50
 
     img_rows, img_cols = 256, 256
@@ -163,7 +167,7 @@ if __name__ == '__main__':
     tensor_board = TensorBoard(log_dir='./Graph', histogram_freq=0, write_graph=True, write_images=True)
 
     # Import data
-    labels = pd.read_csv("../labels/trainLabels_master_256_v2.csv")
+    labels = pd.read_csv("../labels/trainLabels_master_256_v2_seriousDR.csv")
     # Use this if the number of classes you want is 2
     # labels = pd.read_csv("../labels/trainLabels_master_256_v2_binary.csv")
     X1 = np.load("../data/X_train.npy")

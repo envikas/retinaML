@@ -50,10 +50,10 @@ def save_to_array(arr_name, arr_object):
     return np.save(arr_name, arr_object)
 
 
-# if __name__ == '__main__':
-#     labels = pd.read_csv("../labels/trainLabels_master_256_v2.csv")
-#
-#     print("Writing Train Array")
-#     X_trainarray = convert_images_to_arrays_train('../data/train-resized-256/', labels)
-#
-#     save_to_array('../data/X_train.npy', X_trainarray)
+if __name__ == '__main__':
+    labels = pd.read_csv("../labels/trainLabels_master_256_v2_binary.csv")
+
+    print("Writing Train Array")
+    X_trainarray = convert_images_to_arrays_train('../data/train-resized-256/', labels)
+
+    save_to_array('../data/X_train.npy', X_trainarray)
