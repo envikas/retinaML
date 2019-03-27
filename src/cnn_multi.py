@@ -87,31 +87,52 @@ def cnn_model (kernel_size, nb_filters, channels, nb_classes):
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
 
-    model.add(Conv2D(128, (4, 4)))
+    model.add(Conv2D(128, (3, 3)))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
 
-    model.add(Conv2D(64, (5, 5)))
+    model.add(Conv2D(64, (3, 3)))
     model.add(Activation('relu'))
     model.add(MaxPooling2D(pool_size=(2, 2)))
+
+    model.add(Conv2D(32, (3, 3)))
+    model.add(Activation('relu'))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
+
 
     # kernel_size = (5, 5)
     # model.add(Conv2D(32, (kernel_size[0], kernel_size[1])))
     # model.add(Activation('relu'))
     # # model.add(Dropout(0.2))
     #
-    # model.add(MaxPooling2D(pool_size=(2, 2)))
+    # # model.add(MaxPooling2D(pool_size=(2, 2)))
 
     model.add(Flatten())
     print("Model flattened out to: ", model.output_shape)
 
-    model.add(Dense(64))
+    model.add(Dense(64, input_dim=model.output_shape[1]))
     model.add(Activation('sigmoid'))
-    model.add(Dropout(0.25))
-
-    # model.add(Dense(16))
-    # model.add(Activation('sigmoid'))
     # model.add(Dropout(0.25))
+
+    # model.add(Dense(4))
+    # model.add(Activation('sigmoid'))
+    # # model.add(Dropout(0.25))
+    #
+    # model.add(Dense(4))
+    # model.add(Activation('sigmoid'))
+    # # model.add(Dropout(0.25))
+    #
+    # model.add(Dense(4))
+    # model.add(Activation('sigmoid'))
+    # # model.add(Dropout(0.25))
+    #
+    # model.add(Dense(8))
+    # model.add(Activation('sigmoid'))
+    # # model.add(Dropout(0.25))
+    #
+    # model.add(Dense(4))
+    # model.add(Activation('sigmoid'))
+    # # model.add(Dropout(0.25))
 
 
     model.add(Dense(nb_classes))
@@ -149,7 +170,7 @@ if __name__ == '__main__':
     os.environ["CUDA_VISIBLE_DEVICES"]="0,1,2,3"
 
     # Specify parameters before model is run.
-    batch_size = 100
+    batch_size = 10
     nb_classes = 2
     nb_epoch = 50
 
