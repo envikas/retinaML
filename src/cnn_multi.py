@@ -85,11 +85,11 @@ def cnn_model (kernel_size, nb_filters, channels, nb_classes):
                      strides=4,
                      input_shape=(img_rows, img_cols, channels)))
     model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
+    # model.add(MaxPooling2D(pool_size=(2, 2)))
 
     model.add(Conv2D(128, (3, 3)))
     model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
+    # model.add(MaxPooling2D(pool_size=(2, 2)))
 
     model.add(Conv2D(64, (3, 3)))
     model.add(Activation('relu'))
@@ -181,14 +181,14 @@ if __name__ == '__main__':
     model = cnn_model( kernel_size, nb_filters, channels, nb_classes)
     stop = EarlyStopping(monitor='val_acc',
                          min_delta=0.001,
-                         patience=10,
+                         patience=2,
                          verbose=0,
                          mode='auto')
 
     tensor_board = TensorBoard(log_dir='./Graph', histogram_freq=0, write_graph=True, write_images=True)
 
     # Import data
-    labels = pd.read_csv("../labels/trainLabels_master_256_v2_seriousDR.csv")
+    labels = pd.read_csv("../labels/trainLabels_master_256_v2_binary.csv")
     # Use this if the number of classes you want is 2
     # labels = pd.read_csv("../labels/trainLabels_master_256_v2_binary.csv")
     X1 = np.load("../data/X_train.npy")
@@ -197,8 +197,10 @@ if __name__ == '__main__':
     y1 = np.array(labels['level'])
     y_SplitList = np.array_split(y1, 10)
 
+
     # Running the training for every element in the above split array
-    for i in range (0, len(X_SplitList)-1):
+    # for i in range (0, len(X_SplitList)-1):
+    for i in range(0, 1):
         X = X_SplitList[i]
         y = y_SplitList[i]
 

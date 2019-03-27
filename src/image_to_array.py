@@ -31,10 +31,10 @@ def convert_images_to_arrays_train(file_path, df):
 
     lst_imgs = [l for l in df['train_image_name']]
     returnVal = []
-    # return np.array([np.array(Image.open(file_path + img)) for img in lst_imgs])
-    for img in lst_imgs:
-      returnVal.append(np.array(Image.open(file_path + img)))
-    return np.array(returnVal)
+    return np.array([np.array(Image.open(file_path + img)) for img in lst_imgs])
+    # for img in lst_imgs:
+    #   returnVal.append(np.array(Image.open(file_path + img)))
+    # return np.array(returnVal)
 
 
 def save_to_array(arr_name, arr_object):

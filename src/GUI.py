@@ -77,20 +77,20 @@ class Window(Frame):
         # Passing the image through the NN model
         img_rows, img_cols = 256, 256
         channels = 3
-        model = load_model('../models/DR_Two_Classes_recall_0.7528_3715s.h5')
+        model = load_model('../models/DR_Five_Classes_recall_0.7796.h5')
         X_test = imageArray
         X_test = self.reshape_data(X_test, img_rows, img_cols, channels)
         X_test = X_test.astype('float32')
         X_test /= 255
         y_pred = model.predict_classes(X_test)
-        print(y_pred)
+        print(model.predict(X_test))
         lefteyeresult = ''
         righteyeresult = ''
         if y_pred[0] == 0:
             lefteyeresult = 'No Retinopathy'
-        elif y_pred[0] == 1:
+        elif y_pred[0] > 0:
             lefteyeresult = 'Possible Retinopathy'
-        if y_pred[1] == 1:
+        if y_pred[1] > 0:
             righteyeresult = 'Possible Retinopathy'
         elif y_pred[1] == 0:
             righteyeresult = 'No Retinopathy'
